@@ -129,7 +129,6 @@ class BotHandler:
     f"• 💫 Оплата звездами Telegram\n\n"
     f"👇 **Выберите действие:"
 
-        )
         
         # Создаем инлайн клавиатуру
         inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[
