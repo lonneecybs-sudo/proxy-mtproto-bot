@@ -145,7 +145,8 @@ class Database:
     # Методы для работы с пользователями
     
     async def get_or_create_user(self, user_id: int, username: str = None, first_name: str = None) -> Dict:
-
+    async def activate_trial(self, user_id: int):
+        """Активирует пробный период для пользователя"""
     async def activate_trial(self, user_id: int):
         """Активирует пробный период для пользователя"""
         user = await self.fetch_one("SELECT * FROM users WHERE user_id = ?", (user_id,))
