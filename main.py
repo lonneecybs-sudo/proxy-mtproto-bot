@@ -247,7 +247,6 @@ class ProxyBot:
         self.web_app.router.add_post('/api/activate_trial', self.handle_activate_trial)
         
         # Статические файлы (если нужны)
-        self.web_app.router.add_static('/static/', path='static/', name='static')
         
         # Получаем порт из переменных окружения (Railway)
         port = int(os.getenv('PORT', 8080))
