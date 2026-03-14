@@ -120,7 +120,7 @@ class BotHandler:
         
         # Отправляем приветствие
         welcome_text = (
-            f"✨ **Добро пожаловать в ProxyMaster Bot!** ✨\n\n"
+            f"✨ **Добро пожаловать в BProxy Bot!** ✨\n\n"
             f"🚀 Я помогу вам получить быстрые и надежные MTProto прокси "
             f"из канала @ProxyMTProto\n\n"
             f"🔥 **Преимущества:**\n"
