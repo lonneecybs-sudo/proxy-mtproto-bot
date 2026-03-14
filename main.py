@@ -119,17 +119,6 @@ class ProxyBot:
             self.payment_handler, self.parser
         )
         
-        # Регистрируем дополнительные обработчики для FSM
-        self.dp.callback_query.register(
-            self.bot_handler.broadcast_confirm,
-            lambda c: c.data == 'broadcast_confirm'
-        )
-        self.dp.callback_query.register(
-            self.bot_handler.broadcast_cancel,
-            lambda c: c.data == 'broadcast_cancel'
-        )
-        
-        logger.info("Инициализация завершена успешно")
     
     async def handle_index(self, request):
         """Обработчик главной страницы"""
