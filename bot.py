@@ -131,7 +131,7 @@ class BotHandler:
 
         
         # Создаем инлайн клавиатуру
-        inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[
             [
                 InlineKeyboardButton(text='🛒 КУПИТЬ ДОСТУП', callback_data='buy_access'),
                 InlineKeyboardButton(text='📡 ПОЛУЧИТЬ ПРОКСИ', callback_data='get_proxies')
