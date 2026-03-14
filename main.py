@@ -23,7 +23,7 @@ from anonymizer import Anonymizer
 from parser import ProxyParser
 from payments import PaymentHandler
 from proxy_checker import ProxyChecker
-from bot import BotHandler, BroadcastStates
+from bot import BotHandler
 
 # Настройка логирования
 def setup_logging():
