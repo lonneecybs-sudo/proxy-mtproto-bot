@@ -1,10 +1,10 @@
 """
-Основной модуль бота
-Содержит все обработчики команд и callback'ов
 """
 import logging
 import asyncio
 import os
+import re
+import glob
 from datetime import datetime
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command, CommandStart
@@ -14,7 +14,6 @@ from aiogram.types import (
 )
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram.exceptions import TelegramBadRequest
 
 from database import Database
@@ -119,19 +118,20 @@ class BotHandler:
         )
         
         # Отправляем приветствие
-    f"✨ **Добро пожаловать в BProxy!** ✨\n\n"
-    f"🚀 Ваш надежный анонимный прокси-сервис\n\n"
-    f"🔥 **Преимущества BProxy:**\n"
-    f"• ✅ Полная анонимность в сети\n"
-    f"• ⚡ Высокая скорость соединения\n"
-    f"• 🔒 Защита ваших данных\n"
-    f"• 🌐 Доступ к заблокированным сайтам\n"
-    f"• 💫 Оплата звездами Telegram\n\n"
-    f"👇 **Выберите действие:"
-
+        welcome_text = (
+            "✨ **Добро пожаловать в BProxy!** ✨\n\n"
+            "🚀 Ваш надежный анонимный прокси-сервис\n\n"
+            "🔥 **Преимущества BProxy:**\n"
+            "• ✅ Полная анонимность в сети\n"
+            "• ⚡ Высокая скорость соединения\n"
+            "• 🔒 Защита ваших данных\n"
+            "• 🌐 Доступ к заблокированным сайтам\n"
+            "• 💫 Оплата звездами Telegram\n\n"
+            "👇 **Выберите действие:**"
+        )
         
         # Создаем инлайн клавиатуру
-            inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[
             [
                 InlineKeyboardButton(text='🛒 КУПИТЬ ДОСТУП', callback_data='buy_access'),
                 InlineKeyboardButton(text='📡 ПОЛУЧИТЬ ПРОКСИ', callback_data='get_proxies')
@@ -161,7 +161,7 @@ class BotHandler:
             "❓ **Помощь по использованию**\n\n"
             "**Как это работает:**\n"
             "1️⃣ Купите доступ на нужный срок\n"
-            "2️⃣ Получите рабочие MTProto прокси\n"
+            "2️⃣ Получите рабочие прокси\n"
             "3️⃣ Используйте их в любом приложении\n\n"
             "**Команды:**\n"
             "/start - Начать работу\n"
@@ -419,7 +419,6 @@ class BotHandler:
     async def cb_copy_all(self, callback: CallbackQuery):
         # Получаем текст сообщения и извлекаем прокси
         text = callback.message.text
-        import re
         proxies = re.findall(r'🔌 `(proxy[^`]+)`', text)
         
         if proxies:
@@ -495,7 +494,6 @@ class BotHandler:
             return
         
         # Отправляем последние логи
-        import glob
         log_files = list(glob.glob('logs/*.log'))
         
         if log_files:
@@ -614,10 +612,9 @@ class BotHandler:
                         caption=broadcast_message.caption,
                         parse_mode='Markdown'
                     )
-                # Добавьте другие типы сообщений по необходимости
                 
                 success += 1
-                await asyncio.sleep(0.05)  # Защита от флуда
+                await asyncio.sleep(0.05)
                 
             except Exception as e:
                 failed += 1
