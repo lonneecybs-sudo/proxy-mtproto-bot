@@ -27,6 +27,7 @@ logger = logging.getLogger(__name__)
 class BroadcastStates(StatesGroup):
     waiting_for_message = State()
     confirming = State()
+
 class BotHandler:
     """
     Основной класс с обработчиками бота
@@ -56,23 +57,23 @@ class BotHandler:
         self.dp.message.register(self.cmd_admin, Command('admin'))
         
         # Обработчики кнопок главного меню
-        self.dp.message.register(self.menu_buy, F.text == '🛒 Купить прокси')
-        self.dp.message.register(self.menu_proxies, F.text == '📡 Мои прокси')
-        self.dp.message.register(self.menu_stats, F.text == '📊 Статистика')
-        self.dp.message.register(self.menu_help, F.text == '❓ Помощь')
-        self.dp.message.register(self.menu_profile, F.text == '👤 Профиль')
-        self.dp.message.register(self.menu_balance, F.text == '⭐ Баланс Stars')
+        self.dp.message.register(self.menu_buy, F.text == 'Купить прокси')
+        self.dp.message.register(self.menu_proxies, F.text == 'Мои прокси')
+        self.dp.message.register(self.menu_stats, F.text == 'Статистика')
+        self.dp.message.register(self.menu_help, F.text == 'Помощь')
+        self.dp.message.register(self.menu_profile, F.text == 'Профиль')
+        self.dp.message.register(self.menu_balance, F.text == 'Баланс Stars')
         
         # Callback обработчики
         self.dp.callback_query.register(self.cb_buy_access, F.data == 'buy_access')
         self.dp.callback_query.register(self.cb_get_proxies, F.data == 'get_proxies')
         self.dp.callback_query.register(self.cb_help, F.data == 'help')
         self.dp.callback_query.register(self.cb_my_subscriptions, F.data == 'my_subscriptions')
-        self.dp.callback_query.register(self.cb_trial, F.data == "trial")
         self.dp.callback_query.register(self.cb_buy_tariff, F.data.startswith('buy_'))
         self.dp.callback_query.register(self.cb_refresh_proxies, F.data == 'refresh_proxies')
         self.dp.callback_query.register(self.cb_copy_all, F.data == 'copy_all')
         self.dp.callback_query.register(self.cb_refresh_profile, F.data == 'refresh_profile')
+        self.dp.callback_query.register(self.cb_trial, F.data == 'trial')
         
         # Админские callback'и
         self.dp.callback_query.register(self.cb_admin_stats, F.data == 'admin_stats')
@@ -96,9 +97,9 @@ class BotHandler:
     async def get_main_keyboard(self) -> ReplyKeyboardMarkup:
         """Создает главную клавиатуру"""
         keyboard = [
-            [KeyboardButton(text='🛒 Купить прокси'), KeyboardButton(text='📡 Мои прокси')],
-            [KeyboardButton(text='📊 Статистика'), KeyboardButton(text='❓ Помощь')],
-            [KeyboardButton(text='👤 Профиль'), KeyboardButton(text='⭐ Баланс Stars')]
+            [KeyboardButton(text='Купить прокси'), KeyboardButton(text='Мои прокси')],
+            [KeyboardButton(text='Статистика'), KeyboardButton(text='Помощь')],
+            [KeyboardButton(text='Профиль'), KeyboardButton(text='Баланс Stars')]
         ]
         return ReplyKeyboardMarkup(
             keyboard=keyboard,
@@ -131,12 +132,15 @@ class BotHandler:
         # Создаем инлайн клавиатуру
         inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[
             [
-                InlineKeyboardButton(text='🛒 КУПИТЬ ДОСТУП', callback_data='buy_access'),
-                InlineKeyboardButton(text='📡 ПОЛУЧИТЬ ПРОКСИ', callback_data='get_proxies')
+                InlineKeyboardButton(text='КУПИТЬ ДОСТУП', callback_data='buy_access'),
+                InlineKeyboardButton(text='ПОЛУЧИТЬ ПРОКСИ', callback_data='get_proxies')
             ],
             [
-                InlineKeyboardButton(text='❓ ПОМОЩЬ', callback_data='help'),
-                InlineKeyboardButton(text='💳 МОИ ПОДПИСКИ', callback_data='my_subscriptions')
+                InlineKeyboardButton(text='2 ДНЯ БЕСПЛАТНО', callback_data='trial'),
+                InlineKeyboardButton(text='ПОМОЩЬ', callback_data='help')
+            ],
+            [
+                InlineKeyboardButton(text='МОИ ПОДПИСКИ', callback_data='my_subscriptions')
             ]
         ])
         
@@ -188,7 +192,7 @@ class BotHandler:
                 "❌ **У вас нет активной подписки!**\n\n"
                 "Купите доступ чтобы получить прокси 👇",
                 reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-                    [InlineKeyboardButton(text='🛒 КУПИТЬ ДОСТУП', callback_data='buy_access')]
+                    [InlineKeyboardButton(text='КУПИТЬ ДОСТУП', callback_data='buy_access')]
                 ]),
                 parse_mode='Markdown'
             )
@@ -268,7 +272,7 @@ class BotHandler:
         
         keyboard = InlineKeyboardMarkup(inline_keyboard=[
             [
-                InlineKeyboardButton(text='⭐ КУПИТЬ ПРЕМИУМ', callback_data='buy_access'),
+                InlineKeyboardButton(text='КУПИТЬ ПРЕМИУМ', callback_data='buy_access'),
                 InlineKeyboardButton(text='🔄 ОБНОВИТЬ', callback_data='refresh_profile')
             ]
         ])
@@ -389,29 +393,6 @@ class BotHandler:
         await callback.answer()
     
     async def cb_my_subscriptions(self, callback: CallbackQuery):
-
-    async def cb_trial(self, callback: CallbackQuery):
-        """Обработчик пробного периода"""
-        user_id = callback.from_user.id
-        
-        # Проверяем, использовал ли пользователь пробный период
-        trial_available = await self.db.check_trial_available(user_id)
-        
-        if not trial_available:
-            await callback.answer("❌ Вы уже использовали пробный период!", show_alert=True)
-            return
-        
-        # Активируем пробный период
-        success = await self.db.activate_trial(user_id)
-        
-        if success:
-            await callback.message.edit_text(
-                "✅ **Пробный период активирован!**\n\n"
-                "🎁 Вам начислено **2 дня** бесплатного доступа.\n"
-                "Теперь вы можете получать прокси.\n\n"
-                "Нажмите 📡 ПОЛУЧИТЬ ПРОКСИ чтобы начать!",
-                reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-                    [InlineKeyboardButton(text=📡
         await callback.message.delete()
         await self.cmd_profile(callback.message)
         await callback.answer()
@@ -449,6 +430,36 @@ class BotHandler:
                 parse_mode='Markdown'
             )
         await callback.answer("✅ Скопировано!")
+    
+    async def cb_trial(self, callback: CallbackQuery):
+        """Обработчик пробного периода"""
+        user_id = callback.from_user.id
+        
+        # Проверяем, использовал ли пользователь пробный период
+        trial_available = await self.db.check_trial_available(user_id)
+        
+        if not trial_available:
+            await callback.answer("❌ Вы уже использовали пробный период!", show_alert=True)
+            return
+        
+        # Активируем пробный период
+        success = await self.db.activate_trial(user_id)
+        
+        if success:
+            await callback.message.edit_text(
+                "✅ **Пробный период активирован!**\n\n"
+                "🎁 Вам начислено **2 дня** бесплатного доступа.\n"
+                "Теперь вы можете получать прокси.\n\n"
+                "Нажмите ПОЛУЧИТЬ ПРОКСИ чтобы начать!",
+                reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+                    [InlineKeyboardButton(text='ПОЛУЧИТЬ ПРОКСИ', callback_data='get_proxies')]
+                ]),
+                parse_mode='Markdown'
+            )
+        else:
+            await callback.answer("❌ Ошибка активации пробного периода", show_alert=True)
+        
+        await callback.answer()
     
     # Админские callback'и
     
