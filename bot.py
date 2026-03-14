@@ -27,7 +27,6 @@ logger = logging.getLogger(__name__)
 class BroadcastStates(StatesGroup):
     waiting_for_message = State()
     confirming = State()
-
 class BotHandler:
     """
     Основной класс с обработчиками бота
@@ -126,7 +125,6 @@ class BotHandler:
             "• 🔒 Безопасное подключение\n"
             "• 💫 Оплата звездами Telegram\n\n"
             "👇 **Выберите действие:**"
-        )
         )
         
         # Создаем инлайн клавиатуру
