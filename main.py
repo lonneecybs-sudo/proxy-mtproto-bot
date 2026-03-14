@@ -120,8 +120,6 @@ class ProxyBot:
         )
         
         # Регистрируем дополнительные обработчики для FSM
-        self.dp.message.register(
-        )
         self.dp.callback_query.register(
             self.bot_handler.broadcast_confirm,
             lambda c: c.data == 'broadcast_confirm'
