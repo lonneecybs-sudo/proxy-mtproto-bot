@@ -121,8 +121,6 @@ class ProxyBot:
         
         # Регистрируем дополнительные обработчики для FSM
         self.dp.message.register(
-            self.bot_handler.process_broadcast,
-            BroadcastStates.waiting_for_message
         )
         self.dp.callback_query.register(
             self.bot_handler.broadcast_confirm,
