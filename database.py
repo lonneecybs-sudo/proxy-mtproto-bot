@@ -144,12 +144,6 @@ class Database:
     
     # Методы для работы с пользователями
     
-    async def get_or_create_user(self, user_id: int, username: str = None, first_name: str = None) -> Dict:
-    async def activate_trial(self, user_id: int):
-        """Активирует пробный период для пользователя"""
-    async def activate_trial(self, user_id: int):
-        """Активирует пробный период для пользователя"""
-        user = await self.fetch_one("SELECT * FROM users WHERE user_id = ?", (user_id,))
         
         if user and user.get("trial_used"):
             return False
@@ -329,3 +323,24 @@ class Database:
             (f'-{days} days',)
         )
         return result or 0
+
+    async def activate_trial(self, user_id: int):
+        """Активирует пробный период для пользователя"""
+        user = await self.fetch_one("SELECT * FROM users WHERE user_id = ?", (user_id,))
+        
+        if user and user.get("trial_used"):
+            return False
+        
+        from datetime import datetime, timedelta
+        trial_end = datetime.now() + timedelta(days=2)
+        
+        await self.execute(
+            "UPDATE users SET subscription_end = ?, trial_used = 1 WHERE user_id = ?",
+            (trial_end, user_id)
+        )
+        return True
+
+    async def check_trial_available(self, user_id: int) -> bool:
+        """Проверяет, доступен ли пробный период"""
+        user = await self.fetch_one("SELECT trial_used FROM users WHERE user_id = ?", (user_id,))
+        return not (user and user.get("trial_used"))
