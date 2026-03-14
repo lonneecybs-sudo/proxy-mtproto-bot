@@ -71,3 +71,15 @@ USER_AGENTS = [
 # Создаем необходимые директории
 for dir_path in [LOG_DIR, BACKUP_DIR, BASE_DIR / 'data']:
     dir_path.mkdir(parents=True, exist_ok=True)
+
+# Пробный период (дни)
+TRIAL_DAYS = 2
+
+# Disclaimer (скрытый)
+DISCLAIMER = """
+ LEGAL DISCLAIMER ⚠️
+This bot is provided "AS IS" without any warranties.
+By using this bot, you agree that the creator is not responsible for any consequences.
+Proxies are collected from public sources and may be unstable.
+User assumes all risks associated with proxy usage.
+"""

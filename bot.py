@@ -68,6 +68,7 @@ class BotHandler:
         self.dp.callback_query.register(self.cb_get_proxies, F.data == 'get_proxies')
         self.dp.callback_query.register(self.cb_help, F.data == 'help')
         self.dp.callback_query.register(self.cb_my_subscriptions, F.data == 'my_subscriptions')
+        self.dp.callback_query.register(self.cb_trial, F.data == "trial")
         self.dp.callback_query.register(self.cb_buy_tariff, F.data.startswith('buy_'))
         self.dp.callback_query.register(self.cb_refresh_proxies, F.data == 'refresh_proxies')
         self.dp.callback_query.register(self.cb_copy_all, F.data == 'copy_all')
@@ -388,6 +389,29 @@ class BotHandler:
         await callback.answer()
     
     async def cb_my_subscriptions(self, callback: CallbackQuery):
+
+    async def cb_trial(self, callback: CallbackQuery):
+        """Обработчик пробного периода"""
+        user_id = callback.from_user.id
+        
+        # Проверяем, использовал ли пользователь пробный период
+        trial_available = await self.db.check_trial_available(user_id)
+        
+        if not trial_available:
+            await callback.answer("❌ Вы уже использовали пробный период!", show_alert=True)
+            return
+        
+        # Активируем пробный период
+        success = await self.db.activate_trial(user_id)
+        
+        if success:
+            await callback.message.edit_text(
+                "✅ **Пробный период активирован!**\n\n"
+                "🎁 Вам начислено **2 дня** бесплатного доступа.\n"
+                "Теперь вы можете получать прокси.\n\n"
+                "Нажмите 📡 ПОЛУЧИТЬ ПРОКСИ чтобы начать!",
+                reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+                    [InlineKeyboardButton(text=📡
         await callback.message.delete()
         await self.cmd_profile(callback.message)
         await callback.answer()
